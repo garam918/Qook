@@ -6,6 +6,14 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+
+    alias(libs.plugins.googlDevToolsKSP)
+
+    alias(libs.plugins.androidx.room)
+    alias(libs.plugins.serializationPlugins)
+
+    alias(libs.plugins.kotlinCocoapods)
+    alias(libs.plugins.googleServices)
 }
 
 kotlin {
@@ -14,21 +22,72 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
+
+//    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+//    listOf(
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach { iosTarget ->
+//        iosTarget.binaries.framework {
+//            baseName = "ComposeApp"
+//            isStatic = true
+//        }
+//    }
+
+    cocoapods {
+        // Required properties
+        // Specify the required Pod version here
+        // Otherwise, the Gradle project version is used
+        version = "1.0"
+        summary = "Some description for a Kotlin/Native module"
+        homepage = "Link to a Kotlin/Native module homepage"
+        podfile = project.file("../iosApp/Podfile")
+
+
+        // Optional properties
+        // Configure the Pod name here instead of changing the Gradle project name
+        name = "ComposeApp"
+
+        ios.deploymentTarget = "26.2"
+
+
+//        pod("FirebaseAuth") {
+//            extraOpts += listOf("-compiler-option", "-fmodules")
+//        }
+//
+//        pod("FirebaseFirestore") {
+//            extraOpts += listOf("-compiler-option", "-fmodules")
+//        }
+//
+//        pod("GoogleSignIn") {
+//            extraOpts += listOf("-compiler-option", "-fmodules")
+//        }
+
+
+        framework {
             baseName = "ComposeApp"
-            isStatic = true
+            isStatic = false
+            transitiveExport = false // This is default.
+
+            binaryOption("bundleId", "org.example.ComposeApp")
+            linkerOpts.add("-lsqlite3")
+
+
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.androidx.room.sqlite.wrapper)
+            implementation(libs.koin.android)
+
+            implementation(libs.googleid)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -39,6 +98,22 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            implementation(libs.navigation.compose)
+
+            implementation(libs.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
+
+            implementation(libs.kotlinx.serialization.json)
+
+            implementation(libs.kotlinx.datetime)
+
+            api(libs.koin.core)
+
+            implementation(libs.koin.compose.viewmodel)
+
+
+//            implementation(libs.firebase.ai.kmp)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -76,4 +151,27 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+//    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+}
+
+tasks.register("syncAndRun", Exec::class) {
+    dependsOn(tasks.getByName("syncFramework"))
+    workingDir = rootDir.resolve("iosApp")
+    commandLine("sh", "-c", "xcodebuild -showsdks | grep iphoneos && open ${project.name}.xcworkspace")
+}
+
+tasks.register("generateXcodeProject") {
+    dependsOn(tasks.getByName("podInstall")) // Cocoapods를 사용하는 경우
+}
+
+
 
