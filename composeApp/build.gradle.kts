@@ -53,18 +53,27 @@ kotlin {
 
         ios.deploymentTarget = "26.2"
 
+//        pod("PurchasesHybridCommon") {
+//            version = libs.versions.purchases.common.get().toString()
+//            extraOpts += listOf("-compiler-option", "-fmodules")
+//        }
 
-//        pod("FirebaseAuth") {
-//            extraOpts += listOf("-compiler-option", "-fmodules")
+//        pod("RevenueCat") {
+//            version = "5.0.0"
 //        }
-//
-//        pod("FirebaseFirestore") {
-//            extraOpts += listOf("-compiler-option", "-fmodules")
-//        }
-//
-//        pod("GoogleSignIn") {
-//            extraOpts += listOf("-compiler-option", "-fmodules")
-//        }
+
+
+        pod("FirebaseAuth") {
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("FirebaseFirestore") {
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("GoogleSignIn") {
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
 
 
         framework {
@@ -88,6 +97,15 @@ kotlin {
             implementation(libs.koin.android)
 
             implementation(libs.googleid)
+
+            implementation(libs.ktor.client.android)
+
+
+            val bom = project.dependencies.platform("com.google.firebase:firebase-bom:33.1.0")
+            implementation(bom)
+            implementation(libs.google.firebase.auth)
+            implementation(libs.google.services.auth)
+            implementation(libs.firebase.firestore)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -112,11 +130,39 @@ kotlin {
 
             implementation(libs.koin.compose.viewmodel)
 
+//            implementation("com.revenuecat.purchases:purchases-kmp-core:2.2.17+17.26.1")
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
+
+            implementation(libs.firebase.common)
+
+            implementation(libs.jetbrains.navigation3.ui)
+
+
+//            implementation(libs.purchases.core)
+//            implementation(libs.purchases.either)     // Optional
+//            implementation(libs.purchases.result)
 
 //            implementation(libs.firebase.ai.kmp)
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+//        commonTest.dependencies {
+//            implementation(libs.kotlin.test)
+//        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
+
+
+        named { it.lowercase().startsWith("ios") }.configureEach {
+            languageSettings {
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            }
         }
     }
 }
@@ -163,11 +209,11 @@ dependencies {
     add("kspIosArm64", libs.room.compiler)
 }
 
-tasks.register("syncAndRun", Exec::class) {
-    dependsOn(tasks.getByName("syncFramework"))
-    workingDir = rootDir.resolve("iosApp")
-    commandLine("sh", "-c", "xcodebuild -showsdks | grep iphoneos && open ${project.name}.xcworkspace")
-}
+//tasks.register("syncAndRun", Exec::class) {
+//    dependsOn(tasks.getByName("syncFramework"))
+//    workingDir = rootDir.resolve("iosApp")
+//    commandLine("sh", "-c", "xcodebuild -showsdks | grep iphoneos && open ${project.name}.xcworkspace")
+//}
 
 tasks.register("generateXcodeProject") {
     dependsOn(tasks.getByName("podInstall")) // Cocoapods를 사용하는 경우
