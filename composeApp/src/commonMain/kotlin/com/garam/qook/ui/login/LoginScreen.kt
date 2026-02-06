@@ -46,7 +46,7 @@ import com.garam.qook.resources.fontFamily
 import com.garam.qook.resources.googleLoginBtnBorderColor
 import com.garam.qook.resources.mainBackgroundColor
 import com.garam.qook.resources.mainColor
-import com.garam.qook.ui.navigation.RouteHome
+import com.garam.qook.ui.navigation.Route
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -60,7 +60,7 @@ import qook.composeapp.generated.resources.terms_of_use_string
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(onDismiss : () -> Unit, onNavigateToHome : (RouteHome) -> Unit, viewModel: LoginViewModel = koinViewModel()) {
+fun LoginScreen(onDismiss : () -> Unit, onNavigateToHome : (Route.RouteHome) -> Unit, viewModel: LoginViewModel = koinViewModel()) {
 
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(true) }
@@ -119,7 +119,20 @@ fun LoginScreen(onDismiss : () -> Unit, onNavigateToHome : (RouteHome) -> Unit, 
 
                             if(user != null) {
 
-                                onNavigateToHome(RouteHome)
+                                if(viewModel.isExistUser(user.uid)) {
+
+                                    viewModel.getFBData().invokeOnCompletion {
+
+                                        if(viewModel.savedFBList.value.isNotEmpty()) {
+                                            viewModel.saveFBToLocalData()
+                                        }
+                                    }
+                                }
+//                                else {
+//
+//                                }
+                                viewModel.saveUserData(user)
+                                onNavigateToHome(Route.RouteHome)
 
                             }
 
@@ -145,7 +158,20 @@ fun LoginScreen(onDismiss : () -> Unit, onNavigateToHome : (RouteHome) -> Unit, 
 
                         if(user != null) {
 
-                            onNavigateToHome(RouteHome)
+                            if(viewModel.isExistUser(user.uid)) {
+
+                                viewModel.getFBData().invokeOnCompletion {
+
+                                    if(viewModel.savedFBList.value.isNotEmpty()) {
+                                        viewModel.saveFBToLocalData()
+                                    }
+                                }
+                            }
+//                            else {
+//
+//                            }
+                            viewModel.saveUserData(user)
+                            onNavigateToHome(Route.RouteHome)
 
 
                         }
