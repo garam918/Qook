@@ -4,6 +4,9 @@ import com.garam.qook.data.local.LocalUserData
 
 interface AuthRepository {
 
+    fun isLoggedIn() : Boolean
+    suspend fun isExistAccount(uid: String) : Boolean
+
     suspend fun signInWithGoogle(idToken: String, accessToken : String): LocalUserData?
 
     suspend fun signInWithApple(): LocalUserData?
@@ -12,6 +15,8 @@ interface AuthRepository {
 
     suspend fun deleteAccount()
 
-    fun currentUser(): LocalUserData?
+    suspend fun currentUser(): LocalUserData?
+
+    suspend fun updateUserInfo(userInfo: LocalUserData)
 
 }

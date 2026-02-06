@@ -3,7 +3,14 @@ package com.garam.qook.auth
 import cocoapods.FirebaseAuth.FIRAuth
 import cocoapods.FirebaseAuth.FIROAuthProvider
 import cocoapods.FirebaseAuth.FIRUserInfoProtocol
+import cocoapods.FirebaseFirestoreInternal.FIRFirestore
+import com.garam.qook.data.firebase.FirebaseDataSource
 import com.garam.qook.data.local.LocalUserData
+import com.garam.qook.data.local.UserDao
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.firestore.ios
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.AuthenticationServices.ASAuthorization
 import platform.AuthenticationServices.ASAuthorizationAppleIDCredential
@@ -25,17 +32,30 @@ import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 import kotlin.coroutines.resumeWithException
 
-class AuthRepositoryImpl : AuthRepository {
+class AuthRepositoryImpl() : AuthRepository {
 
     private var appleAuthDelegate: NSObject? = null
     private var globalAppleDelegate: Any? = null
 
+    override fun isLoggedIn(): Boolean = FIRAuth.auth().currentUser() != null
+
+    override suspend fun isExistAccount(uid: String): Boolean {
+        return suspendCancellableCoroutine { continuation ->
+            FIRFirestore.firestore().collectionWithPath("Users")
+                .documentWithPath(uid).getDocumentWithCompletion { document, error ->
+
+                    if (document?.exists == true) continuation.resume(true) {}
+                    else continuation.resume(false) {}
+                }
+        }
+    }
 
     override suspend fun signInWithGoogle(
         idToken: String,
         accessToken: String
     ): LocalUserData? = null
 
+    @OptIn(BetaInteropApi::class)
     override suspend fun signInWithApple(): LocalUserData? =
         suspendCancellableCoroutine { continuation ->
 
@@ -93,11 +113,13 @@ class AuthRepositoryImpl : AuthRepository {
 
 
                             val userData =
-                                LocalUserData(email = email, uid = uid, loginType = loginType)
+                                LocalUserData(email = email, uid = uid, loginType = loginType, isPaid = false)
 
                             continuation.resume(userData) {
                                 println(it.message)
                             }
+
+
 
                         } else {
                             println(error?.localizedDescription)
@@ -141,12 +163,28 @@ class AuthRepositoryImpl : AuthRepository {
         TODO("Not yet implemented")
     }
 
-    override fun currentUser(): LocalUserData? {
+    override suspend fun currentUser(): LocalUserData? {
 
         val user = FIRAuth.auth().currentUser()
 
         return if(user == null) null
-        else LocalUserData(user.uid(), user.email(), "Apple")
+        else {
+            val userData = Firebase.firestore.collection("Users").document(user.uid())
+                .get().ios.data()
+
+            val uid = user.uid()
+            val email = user.email()
+            val loginType = "Apple"
+            val isPaid = userData?.getValue("isPaid") as Boolean
+
+            LocalUserData(uid = uid, email = email, loginType = loginType, isPaid = isPaid)
+        }
+
+    }
+
+    override suspend fun updateUserInfo(userInfo: LocalUserData) {
+        Firebase.firestore.collection("Users").document(userInfo.uid)
+            .update(userInfo)
 
     }
 
