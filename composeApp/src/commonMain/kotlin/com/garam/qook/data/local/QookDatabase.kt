@@ -1,4 +1,4 @@
-package com.garam.qook.data
+package com.garam.qook.data.local
 
 
 import androidx.room.ConstructedBy
@@ -11,12 +11,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 
-@Database(entities = [AnalysisData::class], version = 1, exportSchema = true)
+@Database(entities = [LocalRecipeAnalysis::class, LocalUserData::class, LocalGroceryData::class], version = 1, exportSchema = true)
 @ConstructedBy(AppDatabaseConstructor::class)
 @TypeConverters(AnalysisTypeConverter::class)
 abstract class QookDatabase : RoomDatabase(){
 
     abstract fun analysisDao() : AnalysisDao
+
+    abstract fun groceryDao() : GroceryDao
+    abstract fun userDao() : UserDao
 
 }
 

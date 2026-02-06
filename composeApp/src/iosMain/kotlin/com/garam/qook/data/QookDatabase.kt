@@ -2,6 +2,7 @@ package com.garam.qook.data
 
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.garam.qook.data.local.QookDatabase
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
