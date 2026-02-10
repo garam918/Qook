@@ -44,7 +44,6 @@ import com.garam.qook.auth.rememberGoogleAuthHandler
 import com.garam.qook.getPlatform
 import com.garam.qook.resources.fontFamily
 import com.garam.qook.resources.googleLoginBtnBorderColor
-import com.garam.qook.resources.mainBackgroundColor
 import com.garam.qook.resources.mainColor
 import com.garam.qook.ui.navigation.Route
 import kotlinx.coroutines.launch
@@ -132,7 +131,7 @@ fun LoginScreen(onDismiss : () -> Unit, onNavigateToHome : (Route.RouteHome) -> 
 //
 //                                }
                                 viewModel.saveUserData(user)
-                                onNavigateToHome(Route.RouteHome)
+                                onNavigateToHome(Route.RouteHome())
 
                             }
 
@@ -171,7 +170,7 @@ fun LoginScreen(onDismiss : () -> Unit, onNavigateToHome : (Route.RouteHome) -> 
 //
 //                            }
                             viewModel.saveUserData(user)
-                            onNavigateToHome(Route.RouteHome)
+                            onNavigateToHome(Route.RouteHome())
 
 
                         }
