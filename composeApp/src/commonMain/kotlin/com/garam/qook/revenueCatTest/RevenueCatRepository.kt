@@ -3,6 +3,7 @@ package com.garam.qook.revenueCatTest
 import com.revenuecat.purchases.kmp.Purchases
 import com.revenuecat.purchases.kmp.ktx.awaitCustomerInfo
 import com.revenuecat.purchases.kmp.ktx.awaitOfferings
+import com.revenuecat.purchases.kmp.ktx.awaitRestore
 import com.revenuecat.purchases.kmp.models.Offering
 
 class RevenueCatRepository {
@@ -17,8 +18,8 @@ class RevenueCatRepository {
     /**
      * 구독 상태 체크
      */
-    suspend fun hasActiveEntitlement(entId: String): Boolean {
+    suspend fun hasActiveEntitlement(): Boolean {
         val customerInfo = Purchases.sharedInstance.awaitCustomerInfo()
-        return customerInfo.entitlements[entId]?.isActive == true
+        return customerInfo.entitlements["Qook Pro"]?.isActive == true
     }
 }
