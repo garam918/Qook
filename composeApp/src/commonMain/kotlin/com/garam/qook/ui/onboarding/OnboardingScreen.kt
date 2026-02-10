@@ -29,14 +29,14 @@ import androidx.compose.ui.unit.sp
 import com.garam.qook.resources.fontFamily
 import com.garam.qook.resources.mainColor
 import com.garam.qook.ui.login.LoginScreen
-import com.garam.qook.ui.navigation.RouteHome
+import com.garam.qook.ui.navigation.Route
 import org.jetbrains.compose.resources.painterResource
 import qook.composeapp.generated.resources.Res
 import qook.composeapp.generated.resources.onboarding_img
 
 
 @Composable
-fun OnBoardingScreen(onNavigateToHome : (RouteHome) -> Unit) {
+fun OnBoardingScreen(onNavigateToHome : (Route.RouteHome) -> Unit) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
 
