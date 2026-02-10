@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.garam.qook.data.local.LocalUserData
 import com.garam.qook.revenueCatTest.RevenueCatRepository
 import com.revenuecat.purchases.kmp.models.CustomerInfo
 import com.revenuecat.purchases.kmp.models.PurchasesError
@@ -18,12 +19,14 @@ import com.revenuecat.purchases.kmp.ui.revenuecatui.PaywallOptions
 @Composable
 fun PaywallScreen(
     revenueCatRepo: RevenueCatRepository,
-    onPurchaseComplete: () -> Unit,
+    onPurchaseComplete: (LocalUserData) -> Unit,
     onDismiss : () -> Unit,
+    currentUser: LocalUserData
 ) {
 
     // 로딩/상품 상태
     var offerings by remember { mutableStateOf<List<StoreProduct>>(emptyList()) }
+    val currentUser by remember { mutableStateOf(currentUser) }
 
     LaunchedEffect(Unit) {
         try {
@@ -53,12 +56,14 @@ fun PaywallScreen(
 
                         println("🎉 프리미엄 유저가 되었습니다!")
 
-                        onPurchaseComplete()
+                        onPurchaseComplete(currentUser)
 
                     }
                 }
 
                 override fun onRestoreCompleted(customerInfo: CustomerInfo) {
+
+                    onPurchaseComplete(currentUser)
 
                 }
 
