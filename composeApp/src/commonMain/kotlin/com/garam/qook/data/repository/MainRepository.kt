@@ -17,7 +17,7 @@ interface MainRepository {
 
     fun getAllData(uid: String) : Flow<List<LocalRecipeAnalysis>>
 
-    suspend fun sendUrl(apiRequest: ApiRequest) : Result<RecipeAnalysis>
+    suspend fun sendUrl(apiRequest: ApiRequest) : Result<RecipeAnalysis?>
 
     suspend fun signOut()
 
@@ -26,5 +26,7 @@ interface MainRepository {
     suspend fun deleteGrocery(id: String)
 
     fun getGrocery() : Flow<List<LocalGroceryData>>
+
+    suspend fun updateUserData(localUserData: LocalUserData)
 
 }

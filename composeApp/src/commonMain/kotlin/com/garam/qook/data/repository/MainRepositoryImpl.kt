@@ -9,6 +9,7 @@ import com.garam.qook.data.local.LocalGroceryData
 import com.garam.qook.data.local.LocalRecipeAnalysis
 import com.garam.qook.data.local.LocalUserData
 import com.garam.qook.data.remote.ApiRequest
+import com.garam.qook.data.remote.ApiResponse
 import com.garam.qook.data.remote.ApiService
 import com.garam.qook.data.toLocal
 import com.garam.qook.data.toUI
@@ -41,12 +42,19 @@ class MainRepositoryImpl(
         analysisDao.getAll(uid)
 
 
-    override suspend fun sendUrl(apiRequest: ApiRequest): Result<RecipeAnalysis> = try {
+    override suspend fun sendUrl(apiRequest: ApiRequest): Result<RecipeAnalysis?> = try {
 
         val response = apiService.sendUrl(apiRequest)
-        Result.success(response.recipe[0].toLocal().toUI())
+        println("send url response: ${response}")
+        Result.success(response.recipe[0].toLocal(response.source).toUI())
+//        when(response) {
+//            is ApiResponse.ApiSuccess -> Result.success(response.recipe[0].toLocal().toUI())
+//            is ApiResponse.ApiFailure -> Result.success(null)
+//        }
+
 
     } catch (e: Exception) {
+        println("sendUrl error:${e.message}")
         Result.failure(e)
     }
 
@@ -64,4 +72,7 @@ class MainRepositoryImpl(
     }
 
     override fun getGrocery(): Flow<List<LocalGroceryData>> = groceryDao.getGroceryList()
+
+    override suspend fun updateUserData(localUserData: LocalUserData) = authRepository.updateUserInfo(localUserData)
+
 }
