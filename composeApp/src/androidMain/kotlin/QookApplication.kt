@@ -2,9 +2,8 @@ package com.garam.qook
 
 import android.app.Application
 import com.garam.qook.di.initKoin
+import com.garam.qook.revenueCatTest.RevenueCatManager
 import org.koin.android.ext.koin.androidContext
-
-//import com.garam.qook.revenueCatTest.configureRevenueCat
 
 class QookApplication : Application() {
 
@@ -14,6 +13,12 @@ class QookApplication : Application() {
         initKoin(
             appDeclaration = { androidContext(this@QookApplication) },
         )
-//        configureRevenueCat()
+
+        val apiKey = BuildConfig.RevenueCat_API_KEY
+
+        RevenueCatManager.init(
+            apiKey = apiKey,
+            appUserId = "app0f19328683",
+        )
     }
 }
