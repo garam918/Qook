@@ -11,7 +11,7 @@ import io.ktor.util.reflect.TypeInfo
 
 class ApiService(private val httpClient: HttpClient) {
 
-    suspend fun sendUrl(url: ApiRequest) : ApiResponse {
+    suspend fun sendUrl(url: ApiRequest) : ApiResponse.ApiSuccess {
         return httpClient.post("https://blithely-nonfortifiable-marx.ngrok-free.dev/extract-recipe") {
             contentType(ContentType.Application.Json)
             setBody(url)
