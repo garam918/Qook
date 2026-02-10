@@ -84,7 +84,6 @@ class AuthRepositoryImpl() : AuthRepository {
         else {
             Firebase.firestore.collection("Users").document(user.uid)
                 .get().await().toObject(LocalUserData::class.java)
-//            LocalUserData(uid = user.uid, email = user.email, loginType = "google", isPaid = false)
         }
 
 //        val loginType = if(user?.isAnonymous == true) "anonymous"
@@ -98,7 +97,8 @@ class AuthRepositoryImpl() : AuthRepository {
     }
 
     override suspend fun updateUserInfo(userInfo: LocalUserData) {
+
         Firebase.firestore.collection("Users").document(userInfo.uid)
-            .update("paid", userInfo.paid)
+            .update("paid", userInfo.paid, "lastUseDate", userInfo.lastUseDate, "usageCount", userInfo.usageCount)
     }
 }

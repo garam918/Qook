@@ -32,7 +32,7 @@ import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 import kotlin.coroutines.resumeWithException
 
-class AuthRepositoryImpl() : AuthRepository {
+class AuthRepositoryImpl(private val userDao: UserDao) : AuthRepository {
 
     private var appleAuthDelegate: NSObject? = null
     private var globalAppleDelegate: Any? = null
@@ -113,7 +113,7 @@ class AuthRepositoryImpl() : AuthRepository {
 
 
                             val userData =
-                                LocalUserData(email = email, uid = uid, loginType = loginType, isPaid = false)
+                                LocalUserData(email = email, uid = uid, loginType = loginType, paid = false)
 
                             continuation.resume(userData) {
                                 println(it.message)
@@ -177,7 +177,7 @@ class AuthRepositoryImpl() : AuthRepository {
             val loginType = "Apple"
             val isPaid = userData?.getValue("isPaid") as Boolean
 
-            LocalUserData(uid = uid, email = email, loginType = loginType, isPaid = isPaid)
+            LocalUserData(uid = uid, email = email, loginType = loginType, paid = isPaid)
         }
 
     }
