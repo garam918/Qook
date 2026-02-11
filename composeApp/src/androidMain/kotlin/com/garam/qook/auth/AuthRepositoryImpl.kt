@@ -1,14 +1,14 @@
 package com.garam.qook.auth
 
-import com.garam.qook.data.firebase.FirebaseDataSource
 import com.garam.qook.data.local.LocalUserData
-import com.garam.qook.data.local.UserDao
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 class AuthRepositoryImpl() : AuthRepository {
 
@@ -51,13 +51,14 @@ class AuthRepositoryImpl() : AuthRepository {
 
         val user = Firebase.auth.signInWithCredential(googleCredential).await().user
 
-        val email = user?.email
+        val email = user?.email ?: user?.providerData[1]?.email
         val uid = user?.uid.toString()
         val loginType = "google"
 
         return if (isExistAccount(uid)) Firebase.firestore.collection("Users").document(uid)
                 .get().await().toObject(LocalUserData::class.java)
-        else LocalUserData(uid = uid, email = email, loginType = loginType, paid = false)
+        else LocalUserData(uid = uid, email = email, loginType = loginType, paid = false, lastUseDate = Clock.System.todayIn(
+            TimeZone.currentSystemDefault()).toString(), usageCount = 3)
 
 //        }
     }
