@@ -69,8 +69,8 @@ import com.garam.qook.resources.fontFamily
 import com.garam.qook.resources.linkTextFieldBorderColor
 import com.garam.qook.resources.mainBackgroundColor
 import com.garam.qook.resources.mainColor
-import com.garam.qook.revenueCatTest.RevenueCatRepository
 import com.garam.qook.ui.dialog.AnalysisLimitDialogScreen
+import com.garam.qook.ui.dialog.DeleteAccountDialog
 import com.garam.qook.ui.dialog.LogOutDialog
 import com.garam.qook.util.getRelativeTimeTextEn
 import com.garam.qook.util.isYouTubeUrl
@@ -124,6 +124,8 @@ fun HomeScreen(
 
     var isShowLogoutDialog by remember { mutableStateOf(false) }
 
+    var isShowDeleteAccountDialog by remember { mutableStateOf(false) }
+
     var isShowUpgradeDialog by remember { mutableStateOf(false) }
 
     val groceryList by viewModel.groceryList.collectAsState()
@@ -154,6 +156,22 @@ fun HomeScreen(
 
     })
 
+    if(isShowDeleteAccountDialog) DeleteAccountDialog(
+        onDismiss = {
+            isShowDeleteAccountDialog = false
+        },
+        onDeleteAccount = {
+
+            isShowDeleteAccountDialog = false
+
+            viewModel.deleteAccount().invokeOnCompletion {
+                onNavigationToOnboarding()
+            }
+
+
+        }
+    )
+
     LaunchedEffect(Unit) {
 
         viewModel.getCurrentUser()
@@ -170,7 +188,7 @@ fun HomeScreen(
             ModalDrawerSheet(modifier = Modifier.width(250.dp)) {
                 DrawerMenuContent(
                     onLogout = { isShowLogoutDialog = true },
-                    onDeleteAccount = { /* 탈퇴 로직 */ },
+                    onDeleteAccount = { isShowDeleteAccountDialog = true },
                     onNavigationToPaywall = {
                         onNavigationToPaywall()
                     },
@@ -572,19 +590,21 @@ fun DrawerMenuContent(
 
         Spacer(modifier = Modifier.weight(1f)) // 아래로 밀어내기
 
-        // 하단 영역 (Delete Account 및 정책)
-//        TextButton(onClick = onDeleteAccount) {
-////            Icon(Icons.Default.DeleteForever, contentDescription = null, tint = Color.Red)
-//            Spacer(Modifier.width(8.dp))
-//            Text("Delete Account", color = Color.Red)
-//        }
-
         NavigationDrawerItem(
             label = { Text("Logout") },
             selected = false,
             onClick = onLogout,
             icon = { Icon(painter = painterResource(Res.drawable.logout), contentDescription = null) }
         )
+
+
+
+        // 하단 영역 (Delete Account 및 정책)
+        TextButton(onClick = onDeleteAccount) {
+//            Icon(Icons.Default.DeleteForever, contentDescription = null, tint = Color.Red)
+            Spacer(Modifier.width(8.dp))
+            Text("Delete Account", color = Color.Red)
+        }
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
