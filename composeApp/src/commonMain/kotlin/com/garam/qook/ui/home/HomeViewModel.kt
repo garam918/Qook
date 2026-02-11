@@ -67,6 +67,10 @@ class HomeViewModel(
         repository.signOut()
     }
 
+    fun deleteAccount() = viewModelScope.launch {
+        repository.deleteAccount()
+    }
+
     fun updateUser(user: LocalUserData) = viewModelScope.launch {
         repository.updateUserData(user)
         _currentUser.update {
