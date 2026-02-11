@@ -21,6 +21,8 @@ interface MainRepository {
 
     suspend fun signOut()
 
+    suspend fun deleteAccount()
+
     suspend fun saveGrocery(localGroceryData: LocalGroceryData)
 
     suspend fun deleteGrocery(id: String)

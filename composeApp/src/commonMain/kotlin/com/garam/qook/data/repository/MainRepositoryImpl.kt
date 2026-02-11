@@ -62,6 +62,9 @@ class MainRepositoryImpl(
         authRepository.signOut()
     }
 
+    override suspend fun deleteAccount() {
+        authRepository.deleteAccount()
+    }
 
     override suspend fun saveGrocery(localGroceryData: LocalGroceryData) {
         groceryDao.upsertGrocery(localGroceryData)
