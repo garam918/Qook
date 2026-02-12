@@ -2,7 +2,7 @@
 
 ## 1. Tech Stack
 * **Language:** **Kotlin**
-* **Architecture:** **Google's Recommended App Architecture** (MVVM + Repository)
+* **Architecture:** **Google App Architecture** (MVVM + Repository)
 * **Dependency Injection:** **Koin**
 * **Local Database:** **Room**
 * **Asynchronous Processing:** **Coroutines & Flow**
