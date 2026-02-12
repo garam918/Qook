@@ -16,6 +16,18 @@ class MainActivity : ComponentActivity() {
             App()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        AndroidContextProvider.activity = this
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        AndroidContextProvider.activity = null
+    }
 }
 
 @Preview

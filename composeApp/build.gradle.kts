@@ -1,5 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -51,20 +52,35 @@ kotlin {
         // Configure the Pod name here instead of changing the Gradle project name
         name = "ComposeApp"
 
-        ios.deploymentTarget = "26.2"
+        ios.deploymentTarget = "16.0"
 
-
-//        pod("FirebaseAuth") {
+//        pod("PurchasesHybridCommon") {
+//            version = libs.versions.purchases.common.get()
 //            extraOpts += listOf("-compiler-option", "-fmodules")
 //        }
 //
-//        pod("FirebaseFirestore") {
+//        pod("PurchasesHybridCommonUI") {
+//            version = libs.versions.purchases.common.get()
 //            extraOpts += listOf("-compiler-option", "-fmodules")
 //        }
-//
-//        pod("GoogleSignIn") {
-//            extraOpts += listOf("-compiler-option", "-fmodules")
-//        }
+
+        pod("RevenueCat") {
+            version = "5.57.1"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+
+        pod("FirebaseAuth") {
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("FirebaseFirestore") {
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
+        pod("GoogleSignIn") {
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
 
 
         framework {
@@ -74,7 +90,9 @@ kotlin {
 
             binaryOption("bundleId", "org.example.ComposeApp")
             linkerOpts.add("-lsqlite3")
-
+            linkerOpts("-F${project.buildDir}/cocoapods/framework")
+            linkerOpts("-framework", "PurchasesHybridCommon")
+            linkerOpts("-framework", "PurchasesHybridCommonUI")
 
         }
     }
@@ -88,6 +106,15 @@ kotlin {
             implementation(libs.koin.android)
 
             implementation(libs.googleid)
+
+            implementation(libs.ktor.client.android)
+
+
+            val bom = project.dependencies.platform("com.google.firebase:firebase-bom:33.1.0")
+            implementation(bom)
+            implementation(libs.google.firebase.auth)
+            implementation(libs.google.services.auth)
+            implementation(libs.firebase.firestore)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -112,25 +139,73 @@ kotlin {
 
             implementation(libs.koin.compose.viewmodel)
 
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
 
-//            implementation(libs.firebase.ai.kmp)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
+
+            implementation(libs.firebase.common)
+
+            implementation(libs.jetbrains.navigation3.ui)
+
+
+//            implementation("com.revenuecat.purchases:purchases-kmp-core:2.2.17+17.26.1")
+
+            implementation(libs.purchases.core)
+            implementation(libs.purchases.either)     // Optional
+            implementation(libs.purchases.result)
+            implementation(libs.purchases.ui)
+
+            implementation(libs.gitlive.firebase.firestore)
+
+            implementation(libs.compose.multiplatform.media.player)
+
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+//        commonTest.dependencies {
+//            implementation(libs.kotlin.test)
+//        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
+
+
+        named { it.lowercase().startsWith("ios") }.configureEach {
+            languageSettings {
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            }
         }
     }
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
     namespace = "com.garam.qook"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.garam.qook"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
+        versionCode = 19
         versionName = "1.0"
+
+        buildConfigField(
+            "String",
+            "RevenueCat_API_KEY",
+            localProperties.getProperty("RevenueCat_API_KEY") ?: "\"test_wcAowsgxNEWVcvelxYnyfwLefzp\""
+        )
     }
     packaging {
         resources {
@@ -163,11 +238,11 @@ dependencies {
     add("kspIosArm64", libs.room.compiler)
 }
 
-tasks.register("syncAndRun", Exec::class) {
-    dependsOn(tasks.getByName("syncFramework"))
-    workingDir = rootDir.resolve("iosApp")
-    commandLine("sh", "-c", "xcodebuild -showsdks | grep iphoneos && open ${project.name}.xcworkspace")
-}
+//tasks.register("syncAndRun", Exec::class) {
+//    dependsOn(tasks.getByName("syncFramework"))
+//    workingDir = rootDir.resolve("iosApp")
+//    commandLine("sh", "-c", "xcodebuild -showsdks | grep iphoneos && open ${project.name}.xcworkspace")
+//}
 
 tasks.register("generateXcodeProject") {
     dependsOn(tasks.getByName("podInstall")) // Cocoapods를 사용하는 경우

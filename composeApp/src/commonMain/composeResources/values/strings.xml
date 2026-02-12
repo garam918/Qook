@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="google_web_client_id">332057090115-a2cu01rspa6qheke4bco70ighgeqtduk.apps.googleusercontent.com</string>
+    <string name="google_ios_oauth_client_id">332057090115-kus8ha8uqdf6b2pf2sdfnd6pe22vk95m.apps.googleusercontent.com</string>
+
+    <string name="terms_of_use_string">https://doc-hosting.flycricket.io/qook-terms-of-use/a3c808f1-2096-4026-a594-c0ebd2f8b001/terms</string>
+    <string name="privacy_policy_string">https://doc-hosting.flycricket.io/qook-privacy-policy/0b94c870-a8b8-4f3b-b90c-b88df5dd9864/privacy</string>
+
+</resources>
